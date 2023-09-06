@@ -1,6 +1,7 @@
 import streamlit as st
 from cryptography.fernet import Fernet
 
+
 st.set_page_config(
     page_title="Páginda de administración de bibliotecas Madrid",
 	layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.

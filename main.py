@@ -1,12 +1,5 @@
-import sqlite3 as sql
+from cryptography.fernet import Fernet
 
-con = sql.connect("new_file.db")
-cur = con.cursor()
-cur.execute("DROP TABLE prueba")
-cur.execute("CREATE TABLE prueba(name, edad)")
+import streamlit as st
 
-for i in range(100):
-    cur.execute("INSERT INTO prueba VALUES(" +str(i)+", "+ str(i+2) + ")")
-# cur.execute("COMMIT")
-res = cur.execute("SELECT * FROM prueba")
-print(res.fetchall())
+st.title("The Library")
