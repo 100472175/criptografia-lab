@@ -5,7 +5,7 @@ from streamlit_extras.switch_page_button import switch_page
 st.title("The Library")
 
 books = [
-    {"title": "The Great Gatsby", "genre": "Fiction", "length": 180},
+    {"title": "The Great Gatsby", "genre": "Fiction","publication_year":1990 "length": 180},
     {"title": "To Kill a Mockingbird", "genre": "Fiction", "length": 281},
     {"title": "1984", "genre": "Science Fiction", "length": 328},
     {"title": "Pride and Prejudice", "genre": "Romance", "length": 432},
@@ -15,6 +15,7 @@ books = [
     {"title": "Harry Potter and the Sorcerer's Stone", "genre": "Fantasy", "length": 309},
     {"title": "The Da Vinci Code", "genre": "Mystery", "length": 454},
 ]
+
 
 
 col_books, col_reservation = st.columns(2)
