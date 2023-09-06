@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
+import sqlite3 as sql
 
 st.title("The Library")
 
@@ -35,3 +36,13 @@ with col_reservation:
     # Here, the reservations the user has already made are shown (max 3)
 
     #st.write("Your current reservations are:",books,format_func=lambda book: book["title"] if book["reserved"] == username else book)
+
+
+con = sql.connect("database.db")
+cur = con.cursor()
+cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE AVAILABLE = '0'")
+books = cur.fetchall()
+# st.write(books)
+con.close()
+a = st.selectbox("Select a book you want to make the reservation on:", books, format_func=lambda book: book[1])
+st.write(a)
