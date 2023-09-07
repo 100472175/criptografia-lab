@@ -1,12 +1,13 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
+import sqlite3 as sqllite
 
 st.set_page_config(
     page_title="Log In",
     layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
     initial_sidebar_state="collapsed",  # Can be "auto", "expanded", "collapsed"
-    page_icon="🧊"
+    page_icon="📚"
 )
 
 username = "2"
@@ -24,12 +25,20 @@ with col_1:
         col_3, _, col_4 = st.columns(3)
         with col_3:
             submitted = st.form_submit_button("Log In")
-            st.write(username)
+            st.session_state["username"] = username
             if submitted:
-                # autentificar
-                # Redirigir a la pagina principal
-                st.session_state["username"] = username
-                switch_page("Library")
+                con = sqllite.connect("database.db")
+                cur = con.cursor()
+                cur.execute("SELECT * FROM USER WHERE username = ? AND password = ?", (username, password))
+                user = cur.fetchall()
+                con.close()
+                if user == []:
+                    st.warning("Wrong username or password")
+                else:
+                    # autentificar
+                    # sleep(1)
+                    # Redirigir a la pagina principal
+                    switch_page("Library")
         with col_4:
             f_password = st.form_submit_button("Forgot the password")
 with col_2:

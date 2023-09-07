@@ -62,10 +62,9 @@ def add_users(user, password, birthdate, id):
     con.commit()
 
 
-
-"""import pick
+"""
+import pick
 options = ["add_books", "add_users"]
 option, index = pick.pick(options, "Title", indicator='=>', default_index=0)
-exec(option + "()")"""
-
-add_books()
+exec(option + "()")
+"""

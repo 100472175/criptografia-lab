@@ -33,7 +33,10 @@ def draw_normal():
             submitted = st.form_submit_button("Select your book")
             if submitted:
                 st.write(
-                    f"Your book is {book_selection['title']}, it is a {book_selection['genre']} book and it has {book_selection['length']} pages")
+                    f"Your book is {book_selection[1]}, it is from {book_selection[2]} book and it has {book_selection[4]} pages")
+                con = sql.connect("database.db")
+                cur = con.cursor()
+
 
     with col_reservation:
         st.header(f"{'Current'} Reservations")
