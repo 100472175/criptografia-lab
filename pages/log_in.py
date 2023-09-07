@@ -10,16 +10,13 @@ st.set_page_config(
     page_icon="📚"
 )
 
-username = "2"
-submitted = False
-
 st.markdown("<h1 style='text-align: center;'>Log In</h1>", unsafe_allow_html=True)
 st.header("Please state your, username and password in order to access your account")
 col_1, col_2 = st.columns(2)
 with col_1:
     with st.form("log_in_form"):
         st.markdown("<h1 style='text-align: center;'>Log In</h1>", unsafe_allow_html=True)
-        st.header("Please state your, username and password in order to access your account")
+        st.header("Please state your username and password in order to access your account")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         col_3, _, col_4 = st.columns(3)

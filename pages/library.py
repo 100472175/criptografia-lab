@@ -31,8 +31,9 @@ def draw_normal():
             cur.execute("SELECT COUNT(*) FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
             number_books = cur.fetchall()
             con.close()
+            st.write(f"You have {number_books[0][0]} reservations")
 
-            if len(books) == 0 or number_books[0][0] > 3:
+            if len(books) == 0 or number_books[0][0] >= 3:
                 non_reservable = True
                 st.warning("You can't make more reservations")
             else:
@@ -65,10 +66,31 @@ def draw_normal():
 
         # st.write("Your current reservations are:",books,format_func=lambda book: book["title"] if book["reserved"] == username else book)
 
+
+
+def draw_admin():
+    st.subheader(f"You are logged as administrator, {username}")
+    tab_normal, tab_admin = st.tabs(["Normal", "Administrator"])
+    with tab_normal:
+        draw_normal()
+    with tab_admin:
+        st.subheader("Administrator Panel")
+        st.write("Here you can see the administrator panel")
+
 try:
     username = st.session_state["username"]
+
+    con = sql.connect("database.db")
+    cur = con.cursor()
+    cur.execute("SELECT role FROM USER WHERE username = ?", (username,))
+    role = cur.fetchall()
+    con.close()
+    if role:
+        role = role[0][0]
     if username == "":
         draw_not_logged()
+    elif role == "admin":
+        draw_admin()
     else:
         draw_normal()
 except KeyError:
