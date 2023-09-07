@@ -24,7 +24,7 @@ def draw_normal():
             # mirar como hacer para que no muestre los que esten reservados
             con = sql.connect("database.db")
             cur = con.cursor()
-            cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE AVAILABLE = '0'")
+            cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = '0'")
             books = cur.fetchall()
             # st.write(books)
             con.close()
@@ -40,7 +40,7 @@ def draw_normal():
         # Here, the reservations the user has already made are shown (max 3)
         con = sql.connect("database.db")
         cur = con.cursor()
-        cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE AVAILABLE = ?", (username,))
+        cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
         books_reserved = cur.fetchall()
         con.close()
         for book in books_reserved:

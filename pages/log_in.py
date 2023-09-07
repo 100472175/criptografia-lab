@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
-from time import sleep
 
 st.set_page_config(
     page_title="Log In",
@@ -26,11 +25,10 @@ with col_1:
         with col_3:
             submitted = st.form_submit_button("Log In")
             st.write(username)
-            st.session_state["username"] = username
             if submitted:
                 # autentificar
-                # sleep(1)
                 # Redirigir a la pagina principal
+                st.session_state["username"] = username
                 switch_page("Library")
         with col_4:
             f_password = st.form_submit_button("Forgot the password")

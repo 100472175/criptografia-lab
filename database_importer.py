@@ -4,7 +4,7 @@ import sqlite3 as sqllite
 def add_books():
     con = sqllite.connect("database.db")
     cur = con.cursor()
-    sql = 'INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT) values(?, ?, ?, ?, ?)'
+    sql = 'INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT, RESERVED) values(?, ?, ?, ?, ?, ?)'
     data = [
         [1, "The Great Gatsby", "F. Scott Fitzgerald", 1925, 180, "pedro"],
         [2, "To Kill a Mockingbird", "Harper Lee", 1960, 281, "0"],
@@ -62,9 +62,10 @@ def add_users(user, password, birthdate, id):
     con.commit()
 
 
-"""
-import pick
+
+"""import pick
 options = ["add_books", "add_users"]
 option, index = pick.pick(options, "Title", indicator='=>', default_index=0)
-exec(option + "()")
-"""
+exec(option + "()")"""
+
+add_books()
