@@ -46,7 +46,6 @@ with tab1:
 		unsafe_allow_html=True
 	)
 
-
 with tab2:
 	st.text("This is inside tab 2")
 

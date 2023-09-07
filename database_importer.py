@@ -1,6 +1,7 @@
 import pick
 import sqlite3 as sql
 
+
 def add_books():
     con = sql.connect("database.db")
     cur = con.cursor()
@@ -52,14 +53,16 @@ def add_books():
     con.commit()
     print(data)
 
-def add_users(user,password,birthdate,id):
+def add_users(user, password, birthdate, id):
     con = sql.connect("database.db")
     sql = 'INSERT INTO USERS (username,password,role,age,id) values (?, ?, ?, ?, ?)'
-    data = [user,password,birthdate,id]
+    data = [user, password, "normie", birthdate, id]
     with con:
-        con.executemany(sql,data)
+        con.executemany(sql, data)
     con.commit()
 
+"""
 options = ["add_books", "add_users"]
 option, index = pick.pick(options, "Title", indicator='=>', default_index=0)
-exec(option+"()")
+exec(option + "()")
+"""
