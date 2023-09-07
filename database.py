@@ -2,14 +2,15 @@ import sqlite3 as sql
 
 con = sql.connect("database.db")
 cur = con.cursor()
-#cur.execute("DROP TABLE USER")
+cur.execute("DROP TABLE USER")
+cur.execute("DROP TABLE AVAILABLE_BOOKS")
 cur.execute("""
      CREATE TABLE USER (
      username VARCHAR(100) NOT NULL PRIMARY KEY,
      password VARCHAR(100),
      role VARCHAR(10),
      birthdate DATE,
-     id CHAR(9)
+     id CHAR(9) UNIQUE NOT NULL
      );
      """)
 

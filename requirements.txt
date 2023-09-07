@@ -34,6 +34,7 @@ more-itertools==10.1.0
 numpy==1.25.2
 packaging==23.1
 pandas==2.1.0
+pick==2.2.0
 Pillow==9.5.0
 protobuf==4.24.2
 pyaes==1.6.1
@@ -76,4 +77,5 @@ tzdata==2023.3
 tzlocal==4.3.1
 urllib3==2.0.4
 validators==0.22.0
+watchdog==3.0.0
 zipp==3.16.2

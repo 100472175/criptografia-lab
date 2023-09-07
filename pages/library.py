@@ -2,12 +2,16 @@ from cryptography.fernet import Fernet
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 import sqlite3 as sql
-from pages.log_in import username
 
 
-st.title("The Library")
+# username = "Paco"
+username = st.session_state["username"]
+col_1, col_2 = st.columns(2)
+with col_1:
+    st.title("The Library")
+with col_2:
+    st.write(f"You are logged as {username}")
 st.subheader("Welcome to the library, here you can see the books available and make reservations on them")
-
 col_books, col_reservation = st.columns(2)
 with col_books:
     with st.form("Book_reservation"):

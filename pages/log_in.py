@@ -1,13 +1,19 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
+from time import sleep
+
+def get_username():
+    return username
 
 st.set_page_config(
     page_title="Log In",
     layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
     initial_sidebar_state="collapsed",  # Can be "auto", "expanded", "collapsed"
+    page_icon="🧊"
 )
-username = ""
+
+username = "2"
 submitted = False
 
 st.markdown("<h1 style='text-align: center;'>Log In</h1>", unsafe_allow_html=True)
@@ -18,13 +24,15 @@ with col_1:
         st.markdown("<h1 style='text-align: center;'>Log In</h1>", unsafe_allow_html=True)
         st.header("Please state your, username and password in order to access your account")
         username = st.text_input("Username")
-        password = st.text_input("Password")
+        password = st.text_input("Password", type="password")
         col_3, _, col_4 = st.columns(3)
         with col_3:
             submitted = st.form_submit_button("Log In")
+            st.write(username)
+            st.session_state["username"] = username
             if submitted:
                 # autentificar
-                pass
+                sleep(1)
                 # Redirigir a la pagina principal
                 switch_page("Library")
         with col_4:
@@ -33,8 +41,8 @@ with col_2:
     with st.form("register_form"):
         st.markdown("<h1 style='text-align: center;'>Register Now</h1>", unsafe_allow_html=True)
         st.header("In case you don't have an account, please fill this forum to create one.")
-        username_r = st.text_input("State your Username")
-        password_R = st.text_input("State your Password")
+        username = st.text_input("State your Username", key="username_r")
+        password = st.text_input("State your Password", key="password_r", type="password")
         birthdate = st.date_input("Birthdate")
         identifier = st.text_input("DNI/NIF")
         submitted = st.form_submit_button("Register")
@@ -43,3 +51,4 @@ with col_2:
             add_users(username, password, birthdate, identifier)
             # Redirigir a la pagina principal
             switch_page("Library")
+
