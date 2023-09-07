@@ -3,9 +3,6 @@ from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
 from time import sleep
 
-def get_username():
-    return username
-
 st.set_page_config(
     page_title="Log In",
     layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
@@ -32,7 +29,7 @@ with col_1:
             st.session_state["username"] = username
             if submitted:
                 # autentificar
-                sleep(1)
+                # sleep(1)
                 # Redirigir a la pagina principal
                 switch_page("Library")
         with col_4:
