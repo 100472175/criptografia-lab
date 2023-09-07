@@ -13,6 +13,7 @@ def img_to_bytes(img_path):
     encoded_img = base64.b64encode(img_bytes).decode()
     return encoded_img
 
+
 def draw_not_logged():
     st.subheader("You are not logged in, please log in or register")
     if st.button("Log In"):
@@ -26,7 +27,7 @@ def draw_normal():
     with col_2:
         st.write(f"You are logged as {username}")
         link = "\Profile"
-        img_path = os.getcwd() + "\images\\ajustes.png"
+        img_path = os.getcwd() + "/images/ajustes.png"
         image_base64 = img_to_bytes(img_path)
         html = f"<a href='{link}'><img width='40' height='40' src='data:image/png;base64,{image_base64}'></a>"
         st.markdown(html, unsafe_allow_html=True)
@@ -67,7 +68,6 @@ def draw_normal():
                 con.close()
                 st.success("Your reservation has been made")
 
-
     with col_reservation:
         st.header(f"{'Current'} Reservations")
         # Here, the reservations the user has already made are shown (max 3)
@@ -79,9 +79,6 @@ def draw_normal():
         for book in books_reserved:
             st.markdown("- " + book[1])
 
-        # st.write("Your current reservations are:",books,format_func=lambda book: book["title"] if book["reserved"] == username else book)
-
-
 
 def draw_admin():
     st.subheader(f"You are logged as administrator, {username}")
@@ -91,10 +88,42 @@ def draw_admin():
     with tab_admin:
         st.subheader("Administrator Panel")
         st.write("Here you can see the administrator panel")
+        st.title("Make someone admin, knowing their unique username")
+        col_make_admin, col_remove_admin = st.columns(2)
+        with col_make_admin:
+            with st.form("make_admin"):
+                st.header("Make someone admin")
+                st.write("Here you can make someone admin, knowing their unique username")
+                username_to_admin = st.text_input("Username")
+                submitted = st.form_submit_button("Make admin")
+                if submitted:
+                    con = sql.connect("database.db")
+                    cur = con.cursor()
+                    if cur.execute('SELECT * FROM USER WHERE username = ?', (username_to_admin,)).fetchall() != []:
+                        cur.execute("UPDATE USER SET role = 'admin' WHERE username = ?", (username_to_admin,))
+                        con.commit()
+                        con.close()
+                        st.success(f"{username_to_admin} is now admin")
+                    else:
+                        st.warning(f"This user {username_to_admin} doesn't exist")
+        with col_remove_admin:
+            with st.form("remove_admin"):
+                st.header("Delete someone's admin")
+                st.write("Here you can remove someone admin, knowing their unique username")
+                username_to_remove_admin = st.text_input("Username")
+                submitted = st.form_submit_button("Remove admin")
+                if submitted:
+                    con = sql.connect("database.db")
+                    cur = con.cursor()
+                    if cur.execute('SELECT * FROM USER WHERE username = ?', (username_to_remove_admin,)).fetchall() != []:
+                        cur.execute("UPDATE USER SET role = 'normal' WHERE username = ?", (username_to_remove_admin,))
+                        con.commit()
+                        con.close()
+                        st.success(f"{username_to_remove_admin} is now normal user")
+
 
 try:
     username = st.session_state["username"]
-
     con = sql.connect("database.db")
     cur = con.cursor()
     cur.execute("SELECT role FROM USER WHERE username = ?", (username,))

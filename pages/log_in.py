@@ -34,6 +34,8 @@ with col_1:
                     switch_page("Library")
         with col_4:
             f_password = st.form_submit_button("Forgot the password")
+
+
 with col_2:
     with st.form("register_form"):
         st.markdown("<h1 style='text-align: center;'>Register Now</h1>", unsafe_allow_html=True)
@@ -45,7 +47,13 @@ with col_2:
         submitted = st.form_submit_button("Register")
         if submitted:
             # autentificar
-            add_users(username, password, birthdate, identifier)
+            try:
+                add_users(username, password, birthdate, identifier)
+                st.session_state["username"] = username
+                switch_page("Library")
+            except sqllite.IntegrityError:
+                st.error("Username already exists, please choose another one")
+
             # Redirigir a la pagina principal
-            switch_page("Library")
+
 
