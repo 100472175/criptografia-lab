@@ -19,6 +19,7 @@ def draw_normal():
     col_books, col_reservation = st.columns(2)
     with col_books:
         with st.form("Book_reservation"):
+            non_reservable = False
             st.header("Books")
             st.write("Here you can see the books available in the library")
             # mirar como hacer para que no muestre los que esten reservados
@@ -26,16 +27,29 @@ def draw_normal():
             cur = con.cursor()
             cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = '0'")
             books = cur.fetchall()
-            # st.write(books)
+
+            cur.execute("SELECT COUNT(*) FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
+            number_books = cur.fetchall()
             con.close()
+
+            if len(books) == 0 or number_books[0][0] > 3:
+                non_reservable = True
+                st.warning("You can't make more reservations")
+            else:
+                non_reservable = False
+
             book_selection = st.selectbox("Select a book you want to make the reservation on:", books,
                                           format_func=lambda book: book[1])
-            submitted = st.form_submit_button("Select your book")
+            submitted = st.form_submit_button("Select your book", disabled=non_reservable)
             if submitted:
                 st.write(
                     f"Your book is {book_selection[1]}, it is from {book_selection[2]} book and it has {book_selection[4]} pages")
                 con = sql.connect("database.db")
                 cur = con.cursor()
+                cur.execute("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", (username, book_selection[0]))
+                con.commit()
+                con.close()
+                st.success("Your reservation has been made")
 
 
     with col_reservation:

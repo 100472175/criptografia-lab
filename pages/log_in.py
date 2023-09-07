@@ -33,7 +33,7 @@ with col_1:
                 user = cur.fetchall()
                 con.close()
                 if user == []:
-                    st.warning("Wrong username or password")
+                    st.error("Wrong username or password")
                 else:
                     # autentificar
                     # sleep(1)
