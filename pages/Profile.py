@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
-from database_importer import delete_user
+from database_importer import delete_user, change_username, change_password
 import sqlite3 as sqllite
 
 def logged_in_profile():
@@ -14,6 +14,8 @@ def logged_in_profile():
     st.markdown("<h1 style='text-align: center;'>Profile</h1>", unsafe_allow_html=True)
     st.header("Here you can see your profile and make changes to it")
     st.write(f"You are logged as {username}")
+
+
     con = sqllite.connect("database.db")
     cur = con.cursor()
     cur.execute("SELECT * FROM USER WHERE username = ?", (username,))
@@ -22,7 +24,24 @@ def logged_in_profile():
     user = user[0]
     username_col, password_col, birthdate_col, identifier_col, role_col = st.columns(5)
     with username_col:
-        st.text_input(f"Username: {user[0]}")
+        new_username = st.text_input(f"Username: {user[0]}")
+        if st.button("Change username"):
+            try:
+                change_username(new_username,username)
+                st.session_state["username"] = new_username
+            except sqllite.IntegrityError:
+                st.error("Username already exists, please choose another one")
+
+
+
+    with password_col:
+        new_password = st.text_input("Password:", type="password")
+        if st.button("Change password"):
+            try:
+                change_password(username, new_password)
+                st.session_state["username"] = new_username
+            except sqllite.IntegrityError:
+                st.error("Username already exists, please choose another one")
 
 
     if st.button("Log out",type= "secondary"):

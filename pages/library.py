@@ -25,7 +25,6 @@ def draw_normal():
     with col_1:
         st.title("The Library")
     with col_2:
-        st.write(f"You are logged as {username}")
         images = []
         file = os.path.join(os.getcwd(), "images/ajustes.png")
         with open(file, "rb") as image:
@@ -33,11 +32,12 @@ def draw_normal():
             images.append(f"data:image/jpeg;base64,{encoded}")
         clicked = clickable_images(
             images,
-            div_style={"display": "flex", "justify-content": "center", "flex-wrap": "wrap"},
+            div_style={"display": "flex", "justify-content": "left", "flex-wrap": "wrap"},
             img_style={"margin": "5px", "height": "40px"},
         )
         if clicked > -1:
             switch_page("Profile")
+        st.write(f"You are logged as {username}")
 
     st.subheader("Welcome to the library, here you can see the books available and make reservations on them")
     col_books, col_reservation = st.columns(2)

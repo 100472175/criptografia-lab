@@ -69,7 +69,21 @@ def delete_user(user):
     con.commit()
     con.close()
 
+def change_username(user,old_username):
+    con = sqllite.connect("database.db")
+    cur = con.cursor()
+    cur.execute("UPDATE USER SET username = ? WHERE username = ?", (user,old_username))
+    cur.fetchall()
+    con.commit()
+    con.close()
 
+def change_password(user,password):
+    con = sqllite.connect("database.db")
+    cur = con.cursor()
+    cur.execute("UPDATE USER SET password = ? WHERE username = ?", (password,user))
+    cur.fetchall()
+    con.commit()
+    con.close()
 """
 import pick
 options = ["add_books", "add_users"]
