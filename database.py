@@ -7,8 +7,9 @@ cur.execute("""
      CREATE TABLE USER (
      username VARCHAR(100) NOT NULL PRIMARY KEY,
      password VARCHAR(100),
-     role VARCHAR(100),
-     age INTEGER
+     role VARCHAR(10),
+     birthdate DATE,
+     id CHAR(9)
      );
      """)
 

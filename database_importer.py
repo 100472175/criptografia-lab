@@ -52,8 +52,13 @@ def add_books():
     con.commit()
     print(data)
 
-def add_users():
-    print("Nada")
+def add_users(user,password,birthdate,id):
+    con = sql.connect("database.db")
+    sql = 'INSERT INTO USERS (username,password,role,age,id) values (?, ?, ?, ?, ?)'
+    data = [user,password,birthdate,id]
+    with con:
+        con.executemany(sql,data)
+    con.commit()
 
 options = ["add_books", "add_users"]
 option, index = pick.pick(options, "Title", indicator='=>', default_index=0)

@@ -1,5 +1,6 @@
 import streamlit as st
-
+from streamlit_extras.switch_page_button import switch_page
+from database_importer import add_users
 st.set_page_config(
     page_title="Log In",
 	layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
@@ -22,6 +23,7 @@ with col_1:
 				#autentificar
 				pass
 				#Redirigir a la pagina principal
+				switch_page("Library")
 		with col_4:
 			f_password = st.form_submit_button("Forgot the password")
 with col_2:
@@ -35,6 +37,7 @@ with col_2:
 		submitted = st.form_submit_button("Register")
 		if submitted:
 			# autentificar
-			pass
+			add_users(username_r,password_r,birthdate,identifier)
 			# Redirigir a la pagina principal
+			switch_page("Library")
 
