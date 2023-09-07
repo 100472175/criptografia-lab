@@ -84,8 +84,20 @@ def draw_normal():
         cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
         books_reserved = cur.fetchall()
         con.close()
+        c1,c2 = st.columns(2)
+
         for book in books_reserved:
-            st.markdown("- " + book[1])
+            with c1:
+                st.markdown("- " + book[1])
+            with c2:
+                if st.button("Cancel Reservation",key=str(book[0])):
+                    con = sql.connect("database.db")
+                    cur = con.cursor()
+                    cur.execute("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", ("0",book[0]))
+                    cur.fetchall()
+                    con.commit()
+                    con.close()
+                    st.success("Your reservation has been successfully cancelled")
 
 ################################################
 ################ ADMINISTRATOR #################
