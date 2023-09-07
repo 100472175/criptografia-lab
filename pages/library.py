@@ -1,10 +1,10 @@
 import base64
 from pathlib import Path
-
-from cryptography.fernet import Fernet
 import streamlit as st
+from st_clickable_images import clickable_images
 from streamlit_extras.switch_page_button import switch_page
 import sqlite3 as sql
+from cryptography.fernet import Fernet
 import os
 
 
@@ -26,11 +26,19 @@ def draw_normal():
         st.title("The Library")
     with col_2:
         st.write(f"You are logged as {username}")
-        link = "\Profile"
-        img_path = os.getcwd() + "/images/ajustes.png"
-        image_base64 = img_to_bytes(img_path)
-        html = f"<a href='{link}'><img width='40' height='40' src='data:image/png;base64,{image_base64}'></a>"
-        st.markdown(html, unsafe_allow_html=True)
+        images = []
+        file = os.path.join(os.getcwd(), "images/ajustes.png")
+        with open(file, "rb") as image:
+            encoded = base64.b64encode(image.read()).decode()
+            images.append(f"data:image/jpeg;base64,{encoded}")
+        clicked = clickable_images(
+            images,
+            div_style={"display": "flex", "justify-content": "center", "flex-wrap": "wrap"},
+            img_style={"margin": "5px", "height": "40px"},
+        )
+        if clicked > -1:
+            switch_page("Profile")
+
     st.subheader("Welcome to the library, here you can see the books available and make reservations on them")
     col_books, col_reservation = st.columns(2)
     with col_books:
@@ -79,6 +87,9 @@ def draw_normal():
         for book in books_reserved:
             st.markdown("- " + book[1])
 
+################################################
+################ ADMINISTRATOR #################
+################################################
 
 def draw_admin():
     st.subheader(f"You are logged as administrator, {username}")
@@ -88,38 +99,54 @@ def draw_admin():
     with tab_admin:
         st.subheader("Administrator Panel")
         st.write("Here you can see the administrator panel")
-        st.title("Make someone admin, knowing their unique username")
-        col_make_admin, col_remove_admin = st.columns(2)
-        with col_make_admin:
-            with st.form("make_admin"):
-                st.header("Make someone admin")
-                st.write("Here you can make someone admin, knowing their unique username")
-                username_to_admin = st.text_input("Username")
-                submitted = st.form_submit_button("Make admin")
-                if submitted:
+
+
+        tab_books, tab_privileges = st.tabs(["Books", "Privileges"])
+        with tab_books:
+            st.subheader("Books")
+            st.write("Here you can see the books available in the library, add some, modify them or delete them")
+
+        with tab_privileges:
+            col_make_admin, col_remove_admin = st.columns(2)
+            with col_make_admin:
+                with st.form("make_admin"):
+                    st.header("Make someone admin")
+                    st.write("Here you can make someone admin, knowing their unique username")
+                    username_to_admin = st.text_input("Username")
+                    submitted = st.form_submit_button("Make admin")
+                    if submitted:
+                        con = sql.connect("database.db")
+                        cur = con.cursor()
+                        if cur.execute('SELECT * FROM USER WHERE username = ?', (username_to_admin,)).fetchall() != []:
+                            cur.execute("UPDATE USER SET role = 'admin' WHERE username = ?", (username_to_admin,))
+                            con.commit()
+                            con.close()
+                            st.success(f"{username_to_admin} is now admin")
+                        else:
+                            st.warning(f"This user {username_to_admin} doesn't exist")
+            with col_remove_admin:
+                with st.form("remove_admin"):
                     con = sql.connect("database.db")
                     cur = con.cursor()
-                    if cur.execute('SELECT * FROM USER WHERE username = ?', (username_to_admin,)).fetchall() != []:
-                        cur.execute("UPDATE USER SET role = 'admin' WHERE username = ?", (username_to_admin,))
-                        con.commit()
-                        con.close()
-                        st.success(f"{username_to_admin} is now admin")
+                    number_admins = cur.execute("SELECT COUNT(*) FROM USER WHERE role = 'admin'").fetchall()
+                    if number_admins[0][0] > 1:
+                        multiple_admins = True
                     else:
-                        st.warning(f"This user {username_to_admin} doesn't exist")
-        with col_remove_admin:
-            with st.form("remove_admin"):
-                st.header("Delete someone's admin")
-                st.write("Here you can remove someone admin, knowing their unique username")
-                username_to_remove_admin = st.text_input("Username")
-                submitted = st.form_submit_button("Remove admin")
-                if submitted:
-                    con = sql.connect("database.db")
-                    cur = con.cursor()
-                    if cur.execute('SELECT * FROM USER WHERE username = ?', (username_to_remove_admin,)).fetchall() != []:
-                        cur.execute("UPDATE USER SET role = 'normal' WHERE username = ?", (username_to_remove_admin,))
-                        con.commit()
-                        con.close()
-                        st.success(f"{username_to_remove_admin} is now normal user")
+                        multiple_admins = False
+                        st.warning("You can't remove the last admin")
+                    con.close()
+                    st.header("Delete someone's admin")
+                    st.write("Here you can remove someone admin, knowing their unique username")
+                    username_to_remove_admin = st.text_input("Username")
+                    submitted = st.form_submit_button("Remove admin", disabled=not(multiple_admins))
+                    if submitted:
+                        con = sql.connect("database.db")
+                        cur = con.cursor()
+                        if cur.execute('SELECT * FROM USER WHERE username = ?', (username_to_remove_admin,)).fetchall() != []:
+                            cur.execute("UPDATE USER SET role = 'normal' WHERE username = ?", (username_to_remove_admin,))
+                            con.commit()
+                            con.close()
+                            st.success(f"{username_to_remove_admin} is now normal user")
 
 
 try:

@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import delete_user
+import sqlite3 as sqllite
 
 def logged_in_profile():
     st.set_page_config(
@@ -11,12 +12,17 @@ def logged_in_profile():
     )
 
     st.markdown("<h1 style='text-align: center;'>Profile</h1>", unsafe_allow_html=True)
-
-
-
-
-
-
+    st.header("Here you can see your profile and make changes to it")
+    st.write(f"You are logged as {username}")
+    con = sqllite.connect("database.db")
+    cur = con.cursor()
+    cur.execute("SELECT * FROM USER WHERE username = ?", (username,))
+    user = cur.fetchall()
+    con.close()
+    user = user[0]
+    username_col, password_col, birthdate_col, identifier_col, role_col = st.columns(5)
+    with username_col:
+        st.text_input(f"Username: {user[0]}")
 
 
     if st.button("Log out",type= "secondary"):
