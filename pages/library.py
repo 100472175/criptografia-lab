@@ -1,7 +1,17 @@
+import base64
+from pathlib import Path
+
 from cryptography.fernet import Fernet
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 import sqlite3 as sql
+import os
+
+
+def img_to_bytes(img_path):
+    img_bytes = Path(img_path).read_bytes()
+    encoded_img = base64.b64encode(img_bytes).decode()
+    return encoded_img
 
 def draw_not_logged():
     st.subheader("You are not logged in, please log in or register")
@@ -10,11 +20,16 @@ def draw_not_logged():
 
 
 def draw_normal():
-    col_1, col_2 = st.columns(2)
+    col_1,_,_,_,col_2 = st.columns(5)
     with col_1:
         st.title("The Library")
     with col_2:
         st.write(f"You are logged as {username}")
+        link = "\Profile"
+        img_path = os.getcwd() + "\images\\ajustes.png"
+        image_base64 = img_to_bytes(img_path)
+        html = f"<a href='{link}'><img width='40' height='40' src='data:image/png;base64,{image_base64}'></a>"
+        st.markdown(html, unsafe_allow_html=True)
     st.subheader("Welcome to the library, here you can see the books available and make reservations on them")
     col_books, col_reservation = st.columns(2)
     with col_books:

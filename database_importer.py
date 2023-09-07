@@ -7,7 +7,7 @@ def add_books():
     sql = 'INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT, RESERVED) values(?, ?, ?, ?, ?, ?)'
     data = [
         [1, "The Great Gatsby", "F. Scott Fitzgerald", 1925, 180, "pedro"],
-        [2, "To Kill a Mockingbird", "Harper Lee", 1960, 281, "0"],
+        [2, "To Kill a Mockingbird", "Harper Lee", 1960, 281, "anabel"],
         [3, "1984", "George Orwell", 1949, 328, "0"],
         [4, "Pride and Prejudice", "Jane Austen", 1813, 432, "0"],
         [5, "The Hobbit", "J.R.R. Tolkien", 1937, 310, "0"],
@@ -60,6 +60,14 @@ def add_users(user, password, birthdate, id):
     with con:
         con.execute(sql, data)
     con.commit()
+
+def delete_user(user):
+    con = sqllite.connect("database.db")
+    cur = con.cursor()
+    cur.execute("DELETE FROM USER WHERE username = ?", (user,))
+    cur.fetchall()
+    con.commit()
+    con.close()
 
 
 """

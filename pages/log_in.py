@@ -10,8 +10,6 @@ st.set_page_config(
     page_icon="📚"
 )
 
-st.markdown("<h1 style='text-align: center;'>Log In</h1>", unsafe_allow_html=True)
-st.header("Please state your, username and password in order to access your account")
 col_1, col_2 = st.columns(2)
 with col_1:
     with st.form("log_in_form"):
@@ -32,8 +30,6 @@ with col_1:
                 if user == []:
                     st.error("Wrong username or password")
                 else:
-                    # autentificar
-                    # sleep(1)
                     # Redirigir a la pagina principal
                     switch_page("Library")
         with col_4:
