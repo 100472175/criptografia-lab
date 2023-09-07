@@ -2,6 +2,7 @@ from cryptography.fernet import Fernet
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 import sqlite3 as sql
+from pages.log_in import username
 
 
 st.title("The Library")
@@ -30,7 +31,7 @@ with col_reservation:
     # Here, the reservations the user has already made are shown (max 3)
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE AVAILABLE = ?", (log_in.username,))
+    cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE AVAILABLE = ?", (username,))
     books_reserved = cur.fetchall()
     con.close()
     for book in books_reserved:
