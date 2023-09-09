@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
 import sqlite3 as sqllite
+import re
 
 st.set_page_config(
     page_title="Log In",
@@ -43,16 +44,17 @@ with col_2:
         username = st.text_input("State your Username", key="username_r")
         password = st.text_input("State your Password", key="password_r", type="password")
         birthdate = st.date_input("Birthdate")
-        identifier = st.text_input("DNI/NIF")
+        identifier = st.text_input("DNI/NIF, with letter")
         submitted = st.form_submit_button("Register")
         if submitted:
-            # autentificar
             try:
                 add_users(username, password, birthdate, identifier)
                 st.session_state["username"] = username
                 switch_page("Library")
-            except sqllite.IntegrityError:
+            except sqllite.IntegrityError: # If the username is already there
                 st.error("Username already exists, please choose another one")
+            except ValueError as exception:
+                st.error(exception)
 
             # Redirigir a la pagina principal
 

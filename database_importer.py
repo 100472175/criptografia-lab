@@ -1,4 +1,5 @@
 import sqlite3 as sqllite
+import re
 
 
 def add_books():
@@ -53,6 +54,18 @@ def add_books():
     print(data)
 
 def add_users(user, password, birthdate, id):
+    # Check the password is valid, it contains at lesat a special character:
+    spacial_character = ['$', '#', '@', '!', '*']
+    if not any(c in spacial_character for c in password):
+        raise ValueError("Password does not contain a spacial character: " + str(spacial_character))
+    if len(password) < 10:
+        raise ValueError("Password is does not have the minimum length")
+    # Check the id is valid
+    id = id.upper()
+    pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]")
+    if not pattern.match(id):
+        raise ValueError("The id does not math the spanish DNI/NIE format")
+
     rol = "normal"
     con = sqllite.connect("database.db")
     sql = 'INSERT INTO USER (username,password,role,birthdate,id) values (?, ?, ?, ?, ?)'

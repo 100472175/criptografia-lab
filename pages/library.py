@@ -179,4 +179,3 @@ try:
 except KeyError:
     draw_not_logged()
 
-

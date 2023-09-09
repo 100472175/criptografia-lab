@@ -31,7 +31,7 @@ def logged_in_profile():
         with st.form("update_profile"):
             username_col, password_col, rol_col, identifier_col, birthdate_col = st.columns(5)
             with username_col:
-                new_username = st.text_input("Username", value=user[0], key="username", disabled=True)
+                new_username = st.text_input("Username", value=user[0], key="username_n", disabled=True)
             with password_col:
                 new_password = st.text_input("Password", value=user[1], key="password", type="password")
             with rol_col:
@@ -57,9 +57,7 @@ def logged_in_profile():
                 else:
                     st.error("The identifier is not valid, please enter a valid one")
 
-
-
-            # Llamar a la funcion de cambio de cada una individualmente
+            # Llamar a la funcion de cambio de cada una individualmente, o multiples en un mismo comando
 
 
         if st.button("Log out",type= "secondary"):
