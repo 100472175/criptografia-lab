@@ -2,6 +2,18 @@ import sqlite3 as sqllite
 import re
 
 
+def execute_sql_command(function, parameters):
+    con = sqllite.connect("database.db")
+    cur = con.cursor()
+    if parameters != None:
+        cur.execute(function, parameters)
+    else:
+        cur.execute(function)
+    data = cur.fetchall()
+    con.commit()
+    con.close()
+    return data
+
 def add_books():
     con = sqllite.connect("database.db")
     cur = con.cursor()
@@ -75,28 +87,14 @@ def add_users(user, password, birthdate, id):
     con.commit()
 
 def delete_user(user):
-    con = sqllite.connect("database.db")
-    cur = con.cursor()
-    cur.execute("DELETE FROM USER WHERE username = ?", (user,))
-    cur.fetchall()
-    con.commit()
-    con.close()
+    execute_sql_command("DELETE FROM USER WHERE username = ?", (user,))
 
 def change_username(user,old_username):
-    con = sqllite.connect("database.db")
-    cur = con.cursor()
-    cur.execute("UPDATE USER SET username = ? WHERE username = ?", (user,old_username))
-    cur.fetchall()
-    con.commit()
-    con.close()
+    execute_sql_command("UPDATE USER SET username = ? WHERE username = ?", (user,old_username))
 
 def change_password(user,password):
-    con = sqllite.connect("database.db")
-    cur = con.cursor()
-    cur.execute("UPDATE USER SET password = ? WHERE username = ?", (password,user))
-    cur.fetchall()
-    con.commit()
-    con.close()
+    execute_sql_command("UPDATE USER SET password = ? WHERE username = ?", (password,user))
+
 """
 import pick
 options = ["add_books", "add_users"]

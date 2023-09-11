@@ -1,7 +1,8 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
-import sqlite3 as sqllite
+from database_importer import execute_sql_command
+import sqlite3 as sqllite # No se puede borrar debido al integrity error
 
 st.set_page_config(
     page_title="Log In",
@@ -22,11 +23,7 @@ with col_1:
             submitted = st.form_submit_button("Log In")
             st.session_state["username"] = username
             if submitted:
-                con = sqllite.connect("database.db")
-                cur = con.cursor()
-                cur.execute("SELECT * FROM USER WHERE username = ? AND password = ?", (username, password))
-                user = cur.fetchall()
-                con.close()
+                user = execute_sql_command("SELECT * FROM USER WHERE username = ? AND password = ?", (username, password))
                 if user == []:
                     st.error("Wrong username or password")
                 else:

@@ -3,7 +3,8 @@ from pathlib import Path
 import streamlit as st
 from st_clickable_images import clickable_images
 from streamlit_extras.switch_page_button import switch_page
-import sqlite3 as sql
+import sqlite3 as sql # Igual se puede borrar
+from database_importer import execute_sql_command
 from cryptography.fernet import Fernet
 import os
 
@@ -47,14 +48,9 @@ def draw_normal():
             st.header("Books")
             st.write("Here you can see the books available in the library")
             # mirar como hacer para que no muestre los que esten reservados
-            con = sql.connect("database.db")
-            cur = con.cursor()
-            cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = '0'")
-            books = cur.fetchall()
+            books = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = '0'",None)
+            number_books = execute_sql_command("SELECT COUNT(*) FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
 
-            cur.execute("SELECT COUNT(*) FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
-            number_books = cur.fetchall()
-            con.close()
             st.write(f"You have {number_books[0][0]} reservations")
 
             if len(books) == 0 or number_books[0][0] >= 3:
@@ -69,21 +65,13 @@ def draw_normal():
             if submitted:
                 st.write(
                     f"Your book is {book_selection[1]}, it is from {book_selection[2]} book and it has {book_selection[4]} pages")
-                con = sql.connect("database.db")
-                cur = con.cursor()
-                cur.execute("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", (username, book_selection[0]))
-                con.commit()
-                con.close()
+                execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?",(username, book_selection[0]))
                 st.success("Your reservation has been made")
 
     with col_reservation:
         st.header(f"{'Current'} Reservations")
         # Here, the reservations the user has already made are shown (max 3)
-        con = sql.connect("database.db")
-        cur = con.cursor()
-        cur.execute("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
-        books_reserved = cur.fetchall()
-        con.close()
+        books_reserved = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?",(username,))
         c1,c2 = st.columns(2)
 
         for book in books_reserved:
@@ -91,16 +79,12 @@ def draw_normal():
                 st.markdown("- " + book[1])
             with c2:
                 if st.button("Cancel Reservation",key=str(book[0])):
-                    con = sql.connect("database.db")
-                    cur = con.cursor()
-                    cur.execute("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", ("0",book[0]))
-                    cur.fetchall()
-                    con.commit()
-                    con.close()
+                    execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", ("0",book[0]))
                     st.success("Your reservation has been successfully cancelled")
+                    switch_page("Library")
 
 ################################################
-################ ADMINISTRATOR #################
+############# ADMINISTRATOR ####################
 ################################################
 
 def draw_admin():
@@ -138,15 +122,13 @@ def draw_admin():
                             st.warning(f"This user {username_to_admin} doesn't exist")
             with col_remove_admin:
                 with st.form("remove_admin"):
-                    con = sql.connect("database.db")
-                    cur = con.cursor()
-                    number_admins = cur.execute("SELECT COUNT(*) FROM USER WHERE role = 'admin'").fetchall()
+                    number_admins = execute_sql_command("SELECT COUNT(*) FROM USER WHERE role = 'admin'", None)
                     if number_admins[0][0] > 1:
                         multiple_admins = True
                     else:
                         multiple_admins = False
                         st.warning("You can't remove the last admin")
-                    con.close()
+
                     st.header("Delete someone's admin")
                     st.write("Here you can remove someone admin, knowing their unique username")
                     username_to_remove_admin = st.text_input("Username")
@@ -163,11 +145,7 @@ def draw_admin():
 
 try:
     username = st.session_state["username"]
-    con = sql.connect("database.db")
-    cur = con.cursor()
-    cur.execute("SELECT role FROM USER WHERE username = ?", (username,))
-    role = cur.fetchall()
-    con.close()
+    role = execute_sql_command("SELECT role FROM USER WHERE username = ?", (username,))
     if role:
         role = role[0][0]
     if username == "":

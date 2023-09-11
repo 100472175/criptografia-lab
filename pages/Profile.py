@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import delete_user
-import sqlite3 as sqllite
+from database_importer import execute_sql_command
 from datetime import datetime
 import re
 from time import sleep
@@ -18,11 +18,9 @@ def logged_in_profile():
     st.markdown("<h1 style='text-align: center;'>Profile</h1>", unsafe_allow_html=True)
     st.header("Here you can see your profile and make changes to it")
     st.write(f"You are logged as {username}")
-    con = sqllite.connect("database.db")
-    cur = con.cursor()
-    cur.execute("SELECT * FROM USER WHERE username = ?", (username,))
-    user = cur.fetchall()
-    con.close()
+
+    user = execute_sql_command("SELECT * FROM USER WHERE username = ?", (username,))
+
     if user == []:
         st.error("Wrong username or password")
     else:
@@ -43,16 +41,11 @@ def logged_in_profile():
             with identifier_col:
                 new_id = st.text_input("DNI/NIF", value=user[4], key="identifier")
             if st.form_submit_button("Update profile"):
-                st.write(new_username, new_password, new_date, new_id, username)
                 pattern = re.compile("^[0-9]{8}[A-Z]$")
                 id_valid = pattern.match(new_id)
                 if id_valid:
-                    con = sqllite.connect("database.db")
-                    cur = con.cursor()
-                    cur.execute("UPDATE USER SET  password = ?, birthdate = ?, id = ? WHERE username = ?",
+                    execute_sql_command("UPDATE USER SET  password = ?, birthdate = ?, id = ? WHERE username = ?",
                                 (new_password, new_date, new_id, username))
-                    con.commit()
-                    con.close()
                     st.success("The details have been changed successfully")
                 else:
                     st.error("The identifier is not valid, please enter a valid one")
