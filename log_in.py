@@ -64,9 +64,8 @@ with col_1:
 
             if st.form_submit_button("Change password"):
                 if check_id(identifier) and check_password(new_password):
-                    print("hola")
-                    print(username, identifier, new_password)
                     dot = execute_sql_command("UPDATE USER SET password = ? WHERE username = ? AND id = ?", (new_password, username, identifier))
+                    st.success("Password changed successfully")
 
 
 

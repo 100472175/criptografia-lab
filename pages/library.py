@@ -6,6 +6,7 @@ from streamlit_extras.switch_page_button import switch_page
 import sqlite3 as sql # Igual se puede borrar
 from database_importer import execute_sql_command
 from cryptography.fernet import Fernet
+from time import sleep
 import os
 
 
@@ -83,7 +84,6 @@ def draw_normal():
                     st.success("Your reservation has been successfully cancelled")
                     switch_page("Library")
 
-
 ################################################
 ############# ADMINISTRATOR ####################
 ################################################
@@ -101,7 +101,31 @@ def draw_admin():
         tab_books, tab_privileges = st.tabs(["Books", "Privileges"])
         with tab_books:
             st.subheader("Books")
-            st.write("Here you can see the books available in the library, add some, modify them or delete them")
+            list_books, add_book = st.columns(2)
+
+            with list_books:
+                st.write("Here you can see the books available in the library")
+                books = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS",None)
+                st.write(books[-1][0])
+                st.table(i for i in books)
+            with add_book:
+                with st.form("Add a new book"):
+                    st.header("Add a new book to the library")
+                    book_name = st.text_input("Name")
+                    author_name = st.text_input("Author")
+                    pub_year = st.text_input("Publication year")
+                    pages = st.text_input("NÂº of pages")
+                    submitted = st.form_submit_button("Add the book")
+
+                    if submitted:
+                        # Verify data is correct
+                        st.write("Data verification is not done yet")
+
+                        execute_sql_command("INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT, RESERVED) values(?, ?, ?, ?, ?, ?)"
+                                            , (books[-1][0]+1,book_name,author_name,pub_year,pages,"0"))
+                        st.success(f"{book_name} is now available in the library")
+                        sleep(1)
+                        switch_page("Library")
 
         with tab_privileges:
             col_make_admin, col_remove_admin = st.columns(2)
@@ -157,4 +181,3 @@ try:
         draw_normal()
 except KeyError:
     draw_not_logged()
-
