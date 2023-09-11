@@ -74,7 +74,7 @@ def add_users(user, password, birthdate, id):
         raise ValueError("Password is does not have the minimum length")
     # Check the id is valid
     id = id.upper()
-    pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]")
+    pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
     if not pattern.match(id):
         raise ValueError("The id does not math the spanish DNI/NIE format")
 

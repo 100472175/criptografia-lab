@@ -83,6 +83,7 @@ def draw_normal():
                     st.success("Your reservation has been successfully cancelled")
                     switch_page("Library")
 
+
 ################################################
 ############# ADMINISTRATOR ####################
 ################################################

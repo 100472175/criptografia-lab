@@ -41,7 +41,7 @@ def logged_in_profile():
             with identifier_col:
                 new_id = st.text_input("DNI/NIF", value=user[4], key="identifier")
             if st.form_submit_button("Update profile"):
-                pattern = re.compile("^[0-9]{8}[A-Z]$")
+                pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
                 id_valid = pattern.match(new_id)
                 if id_valid:
                     execute_sql_command("UPDATE USER SET  password = ?, birthdate = ?, id = ? WHERE username = ?",

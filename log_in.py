@@ -3,6 +3,7 @@ from streamlit_extras.switch_page_button import switch_page
 from database_importer import add_users
 from database_importer import execute_sql_command
 import sqlite3 as sqllite # No se puede borrar debido al integrity error
+import re
 
 st.set_page_config(
     page_title="Log In",
@@ -11,6 +12,28 @@ st.set_page_config(
     page_icon="📚"
 )
 
+def check_id(identifier):
+    pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
+    id_valid = pattern.match(identifier)
+    if not id_valid:
+        st.error("The identifier is not valid, please enter a valid one")
+        return False
+    return True
+
+def check_password(password):
+    if len(password) < 10:
+        st.error("Password is does not have the minimum length")
+        return False
+
+    spacial_character = ['$', '#', '@', '!', '*']
+    if not any(char in spacial_character for char in password):
+        st.error("Password does not contain a spacial character: " + str(spacial_character))
+        return False
+    else:
+        return True
+
+
+f_password = False
 col_1, col_2 = st.columns(2)
 with col_1:
     with st.form("log_in_form"):
@@ -30,7 +53,22 @@ with col_1:
                     # Redirigir a la pagina principal
                     switch_page("Library")
         with col_4:
-            f_password = st.form_submit_button("Forgot the password")
+            if st.form_submit_button("Forgot the password"):
+                f_password = True
+
+    with st.expander("Forgot password", expanded=f_password):
+        with st.form("forgot_password"):
+            username = st.text_input("Username")
+            identifier = st.text_input("DNI/NIF")
+            new_password = st.text_input("New Password", type="password")
+
+            if st.form_submit_button("Change password"):
+                if check_id(identifier) and check_password(new_password):
+                    print("hola")
+                    print(username, identifier, new_password)
+                    dot = execute_sql_command("UPDATE USER SET password = ? WHERE username = ? AND id = ?", (new_password, username, identifier))
+
+
 
 
 with col_2:
