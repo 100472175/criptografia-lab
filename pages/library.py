@@ -3,8 +3,13 @@ from pathlib import Path
 import streamlit as st
 from st_clickable_images import clickable_images
 from streamlit_extras.switch_page_button import switch_page
-import sqlite3 as sql # Igual se puede borrar
+import sqlite3 as sql  # Igual se puede borrar
 from database_importer import execute_sql_command
+from database_importer import remove_book
+from database_importer import add_book
+from database_importer import get_all_books
+from database_importer import get_reserved_books
+from database_importer import reserve_book
 from cryptography.fernet import Fernet
 from time import sleep
 import os
@@ -23,7 +28,7 @@ def draw_not_logged():
 
 
 def draw_normal():
-    col_1,_,_,_,col_2 = st.columns(5)
+    col_1, _, _, _, col_2 = st.columns(5)
     with col_1:
         st.title("The Library")
     with col_2:
@@ -45,48 +50,49 @@ def draw_normal():
     col_books, col_reservation = st.columns(2)
     with col_books:
         with st.form("Book_reservation"):
-            non_reservable = False
             st.header("Books")
             st.write("Here you can see the books available in the library")
-            # mirar como hacer para que no muestre los que esten reservados
-            books = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = '0'",None)
-            number_books = execute_sql_command("SELECT COUNT(*) FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
+            books = get_reserved_books(None)
+            number_books = get_reserved_books(username)
 
-            st.write(f"You have {number_books[0][0]} reservations")
-
-            if len(books) == 0 or number_books[0][0] >= 3:
+            st.write(f"You have {len(number_books)} reservations")
+            if len(books) == 0 or len(number_books) >= 3:
                 non_reservable = True
                 st.warning("You can't make more reservations")
             else:
                 non_reservable = False
 
             book_selection = st.selectbox("Select a book you want to make the reservation on:", books,
-                                          format_func=lambda book: book[1])
+                                          format_func=lambda book_individual: book_individual[1])
             submitted = st.form_submit_button("Select your book", disabled=non_reservable)
             if submitted:
                 st.write(
-                    f"Your book is {book_selection[1]}, it is from {book_selection[2]} book and it has {book_selection[4]} pages")
-                execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?",(username, book_selection[0]))
+                    f"Your book is {book_selection[1]}, it is from {book_selection[2]} book and "
+                    f"it has {book_selection[4]} pages")
+                reserve_book(username, book_selection[0])
                 st.success("Your reservation has been made")
+                sleep(1)
+                switch_page("Library")
 
     with col_reservation:
         st.header(f"{'Current'} Reservations")
         # Here, the reservations the user has already made are shown (max 3)
-        books_reserved = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?",(username,))
-        c1,c2 = st.columns(2)
-
+        books_reserved = get_reserved_books(username)
+        # books_reserved = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
+        c1, c2 = st.columns(2)
         for book in books_reserved:
             with c1:
                 st.markdown("- " + book[1])
             with c2:
-                if st.button("Cancel Reservation",key=str(book[0])):
-                    execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", ("0",book[0]))
+                if st.button("Cancel Reservation", key=str(book[0])):
+                    execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE BOOK_ID = ?", ("0", book[0]))
                     st.success("Your reservation has been successfully cancelled")
                     switch_page("Library")
 
 ################################################
 ############# ADMINISTRATOR ####################
 ################################################
+
 
 def draw_admin():
     st.subheader(f"You are logged as administrator, {username}")
@@ -97,35 +103,51 @@ def draw_admin():
         st.subheader("Administrator Panel")
         st.write("Here you can see the administrator panel")
 
-
         tab_books, tab_privileges = st.tabs(["Books", "Privileges"])
         with tab_books:
             st.subheader("Books")
-            list_books, add_book = st.columns(2)
+            list_books, manage_books = st.columns(2)
 
             with list_books:
                 st.write("Here you can see the books available in the library")
-                books = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS",None)
+                books = get_all_books()
                 st.write(books[-1][0])
                 st.table(i for i in books)
-            with add_book:
+            with manage_books:
                 with st.form("Add a new book"):
                     st.header("Add a new book to the library")
                     book_name = st.text_input("Name")
                     author_name = st.text_input("Author")
                     pub_year = st.text_input("Publication year")
-                    pages = st.text_input("NÂº of pages")
+                    pages = st.text_input("Nº of pages")
                     submitted = st.form_submit_button("Add the book")
 
                     if submitted:
-                        # Verify data is correct
-                        st.write("Data verification is not done yet")
+                        # Versión Edu:
+                        try:
+                            add_book(book_name, author_name, pub_year, pages)
+                            st.success(f"{book_name} is now available in the library")
+                            sleep(1)
+                            switch_page("Library")
+                        except ValueError as e:
+                            st.warning(e)
 
-                        execute_sql_command("INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT, RESERVED) values(?, ?, ?, ?, ?, ?)"
-                                            , (books[-1][0]+1,book_name,author_name,pub_year,pages,"0"))
-                        st.success(f"{book_name} is now available in the library")
-                        sleep(1)
-                        switch_page("Library")
+
+                with st.form("Remove a book"):
+                    st.header("Remove a book from the library")
+                    book_name = st.text_input("Name")
+                    publication_year = st.text_input("Publication year")
+                    submitted = st.form_submit_button("Remove the book")
+                    if submitted:
+                        try:
+                            remove_book(book_name, int(publication_year))
+                            st.success(f"{book_name} has been removed from the library")
+                            sleep(1)
+                            switch_page("Library")
+                        except ValueError as e:
+                            st.warning(e)
+
+
 
         with tab_privileges:
             col_make_admin, col_remove_admin = st.columns(2)
@@ -157,7 +179,7 @@ def draw_admin():
                     st.header("Delete someone's admin")
                     st.write("Here you can remove someone admin, knowing their unique username")
                     username_to_remove_admin = st.text_input("Username")
-                    submitted = st.form_submit_button("Remove admin", disabled=not(multiple_admins))
+                    submitted = st.form_submit_button("Remove admin", disabled=not multiple_admins)
                     if submitted:
                         con = sql.connect("database.db")
                         cur = con.cursor()
@@ -181,3 +203,24 @@ try:
         draw_normal()
 except KeyError:
     draw_not_logged()
+
+b = """
+                        # Verify data is correct by checking if pub_year and pages are numbers
+                        try:
+                            pub_year = int(pub_year)
+                            pages = int(pages)
+                        except ValueError:
+                            st.warning("Publication year and pages must be numbers")
+                            sleep(1)
+                            switch_page("Library")
+
+                        # Check if the book is already in the library
+                        if execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE BOOK_NAME = ? AND PUBLICATION_YEAR = ?", (book_name, pub_year)) != []:
+                            st.warning("The book is already in the library")
+                            sleep(1)
+                            switch_page("Library")
+
+                        execute_sql_command("INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT, RESERVED) values(?, ?, ?, ?, ?, ?)", (books[-1][0]+1, book_name, author_name, pub_year, pages, "0"))
+                        st.success(f"{book_name} is now available in the library")
+                        sleep(1)
+                        switch_page("Library")"""
