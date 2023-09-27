@@ -6,6 +6,7 @@ import sqlite3 as sqllite # No se puede borrar debido al integrity error
 import re
 from crypto_settings import CryptoSettings
 from cryptography.exceptions import InvalidKey
+import base64
 
 st.set_page_config(
     page_title="Log In",
@@ -68,7 +69,9 @@ with col_1:
 
             if st.form_submit_button("Change password"):
                 if check_id(identifier) and check_password(new_password):
-                    dot = execute_sql_command("UPDATE USER SET password = ? WHERE username = ? AND id = ?", (new_password, username, identifier))
+                    cripto = CryptoSettings()
+                    new_password,salt = cripto.encode(new_password)
+                    dot = execute_sql_command("UPDATE USER SET password = ?, salt = ? WHERE username = ? AND id = ?", (new_password, salt, username, identifier))
                     st.success("Password changed successfully")
 
 
