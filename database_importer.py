@@ -79,7 +79,8 @@ def add_users(user, password, birthdate, user_id):
         raise ValueError("The id does not math the spanish DNI/NIE format")
 
     # Encrypt the user and password
-    password, salt = CryptoSettings().encode(password)
+    cifrador = CryptoSettings()
+    password, salt = cifrador.encode(password)
 
     # Add user to database
     rol = "normal"

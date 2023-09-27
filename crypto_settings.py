@@ -10,14 +10,11 @@ class CryptoSettings:
         self.r = 8
         self.p = 1
 
-    def encode(self, password: str, salt= None):
-        if salt is None:
-            salt = self.salt
-
-        kdf = Scrypt(salt=salt, length=self.length, n=self.n, r=self.r, p=self.p)
+    def encode(self, password: str):
+        kdf = Scrypt(salt=self.salt, length=self.length, n=self.n, r=self.r, p=self.p)
         passwd = kdf.derive(password.encode())
         passwd = base64.b64encode(passwd)
-        return passwd, salt
+        return passwd, self.salt
 
     def decode(self, contrasena, key, salt):
         key = base64.b64decode(key)
