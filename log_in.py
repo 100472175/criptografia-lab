@@ -4,6 +4,8 @@ from database_importer import add_users
 from database_importer import execute_sql_command
 import sqlite3 as sqllite # No se puede borrar debido al integrity error
 import re
+from crypto_settings import CryptoSettings
+from cryptography.exceptions import InvalidKey
 
 st.set_page_config(
     page_title="Log In",
@@ -46,12 +48,14 @@ with col_1:
             submitted = st.form_submit_button("Log In")
             st.session_state["username"] = username
             if submitted:
-                user = execute_sql_command("SELECT * FROM USER WHERE username = ? AND password = ?", (username, password))
-                if user == []:
-                    st.error("Wrong username or password")
-                else:
-                    # Redirigir a la pagina principal
+                user = execute_sql_command("SELECT * FROM USER WHERE username = ?", (username,))
+                result = CryptoSettings()
+                try:
+                    result = result.decode(password, user[0][1], user[0][5])
                     switch_page("Library")
+                except InvalidKey:
+                    st.error("Password is not correct")
+
         with col_4:
             if st.form_submit_button("Forgot the password"):
                 f_password = True

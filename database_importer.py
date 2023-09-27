@@ -1,5 +1,6 @@
-import sqlite3 as sqllite
 import re
+import sqlite3 as sqllite
+from crypto_settings import CryptoSettings
 
 
 def execute_sql_command(function, parameters):
@@ -77,10 +78,14 @@ def add_users(user, password, birthdate, user_id):
     if not pattern.match(user_id):
         raise ValueError("The id does not math the spanish DNI/NIE format")
 
+    # Encrypt the user and password
+    password, salt = CryptoSettings().encode(password)
+
+    # Add user to database
     rol = "normal"
     con = sqllite.connect("database.db")
-    sql = 'INSERT INTO USER (username,password,role,birthdate,id) values (?, ?, ?, ?, ?)'
-    data = [user, password, rol, birthdate, user_id]
+    sql = 'INSERT INTO USER (username,password,role,birthdate,id,salt) values (?, ?, ?, ?, ?, ?)'
+    data = [user, password, rol, birthdate, user_id, salt]
     with con:
         con.execute(sql, data)
     con.commit()
