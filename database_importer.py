@@ -100,8 +100,8 @@ def change_username(user, old_username):
     execute_sql_command("UPDATE USER SET username = ? WHERE username = ?", (user, old_username))
 
 
-def change_password(user, password):
-    execute_sql_command("UPDATE USER SET password = ? WHERE username = ?", (password, user))
+def change_password(user, password, id, salt):
+    execute_sql_command("UPDATE USER SET password = ?, salt = ? WHERE username = ? AND id = ?", (password, salt, user, id))
 
 
 """

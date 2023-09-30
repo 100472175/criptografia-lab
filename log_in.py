@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
-from database_importer import add_users
-from database_importer import execute_sql_command
+from database_importer import *
 import sqlite3 as sqllite # No se puede borrar debido al integrity error
 import re
 from crypto_settings import CryptoSettings
@@ -47,15 +46,18 @@ with col_1:
         col_3, _, col_4 = st.columns(3)
         with col_3:
             submitted = st.form_submit_button("Log In")
-            st.session_state["username"] = username
             if submitted:
                 user = execute_sql_command("SELECT * FROM USER WHERE username = ?", (username,))
-                result = CryptoSettings()
-                try:
-                    result = result.decode(password, user[0][1], user[0][5])
-                    switch_page("Library")
-                except InvalidKey:
-                    st.error("Password is not correct")
+                if user:
+                    result = CryptoSettings()
+                    try:
+                        result = result.verify(password, user[0][1], user[0][5])
+                        st.session_state["username"] = username
+                        switch_page("Library")
+                    except InvalidKey:
+                        st.error("Password is not correct")
+                else:
+                    st.error("Account doesn't exist")
 
         with col_4:
             if st.form_submit_button("Forgot the password"):
@@ -68,11 +70,15 @@ with col_1:
             new_password = st.text_input("New Password", type="password")
 
             if st.form_submit_button("Change password"):
-                if check_id(identifier) and check_password(new_password):
-                    cripto = CryptoSettings()
-                    new_password,salt = cripto.encode(new_password)
-                    dot = execute_sql_command("UPDATE USER SET password = ?, salt = ? WHERE username = ? AND id = ?", (new_password, salt, username, identifier))
-                    st.success("Password changed successfully")
+                exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username,identifier))
+                if exist:
+                    if check_id(identifier) and check_password(new_password):
+                        cripto = CryptoSettings()
+                        new_password,salt = cripto.encode(new_password)
+                        dot = change_password(user,password,identifier,salt)
+                        st.success("Password changed successfully")
+                else:
+                    st.error("Wrong username or id")
 
 
 
@@ -87,7 +93,6 @@ with col_2:
         identifier = st.text_input("DNI/NIF")
         submitted = st.form_submit_button("Register")
         if submitted:
-            # autentificar
             try:
                 add_users(username, password, birthdate, identifier)
                 st.session_state["username"] = username
@@ -95,6 +100,6 @@ with col_2:
             except sqllite.IntegrityError:
                 st.error("Username already exists, please choose another one")
 
-            # Redirigir a la pagina principal
+
 
 

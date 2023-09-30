@@ -3,6 +3,7 @@ from streamlit_extras.switch_page_button import switch_page
 from database_importer import delete_user
 from database_importer import execute_sql_command
 from datetime import datetime
+from crypto_settings import CryptoSettings
 import re
 from time import sleep
 
@@ -32,6 +33,12 @@ def logged_in_profile():
                 new_username = st.text_input("Username", value=user[0], key="username_n", disabled=True)
             with password_col:
                 new_password = st.text_input("Password", value=user[1], key="password", type="password")
+
+                """ No podemos ya que no sabemos la contraseña sin la auntentica contraseña para cambiar xd
+                cripto = CryptoSettings()
+                new_password = st.text_input("Password", value=cripto.decode(user[1],user[5]), key="password", type="password")
+                new_password = cripto.encode(new_password)
+                """
             with rol_col:
                 st.text_input("Role", value=user[2], key="role", disabled=True)
             with birthdate_col:

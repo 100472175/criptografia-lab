@@ -16,7 +16,7 @@ class CryptoSettings:
         passwd = base64.b64encode(passwd)
         return passwd, self.salt
 
-    def decode(self, contrasena, key, salt):
+    def verify(self, contrasena, key, salt):
         key = base64.b64decode(key)
         kdf = Scrypt(salt=salt, length=self.length, n=self.n, r=self.r, p=self.p)
         return kdf.verify(contrasena.encode(), key)

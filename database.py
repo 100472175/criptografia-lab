@@ -5,8 +5,8 @@ def add_books():
     cur = con.cursor()
     sql = 'INSERT INTO AVAILABLE_BOOKS (BOOK_ID, BOOK_NAME, AUTHOR_NAME, PUBLICATION_YEAR, PAGE_COUNT, RESERVED) values(?, ?, ?, ?, ?, ?)'
     data = [
-        [1, "The Great Gatsby", "F. Scott Fitzgerald", 1925, 180, "pedro"],
-        [2, "To Kill a Mockingbird", "Harper Lee", 1960, 281, "anabel"],
+        [1, "The Great Gatsby", "F. Scott Fitzgerald", 1925, 180, "0"],
+        [2, "To Kill a Mockingbird", "Harper Lee", 1960, 281, "0"],
         [3, "1984", "George Orwell", 1949, 328, "0"],
         [4, "Pride and Prejudice", "Jane Austen", 1813, 432, "0"],
         [5, "The Hobbit", "J.R.R. Tolkien", 1937, 310, "0"],
@@ -51,6 +51,7 @@ def add_books():
     con.commit()
     print(data)
 
+
 con = sql3.connect("database.db")
 cur = con.cursor()
 cur.execute("DROP TABLE USER")
@@ -62,6 +63,7 @@ cur.execute("""
      role VARCHAR(10),
      birthdate DATE,
      id CHAR(9) UNIQUE NOT NULL,
+     salt varchar(100) NOT NULL,
      PRIMARY KEY (username)
      
      );

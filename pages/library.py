@@ -4,12 +4,7 @@ import streamlit as st
 from st_clickable_images import clickable_images
 from streamlit_extras.switch_page_button import switch_page
 import sqlite3 as sql  # Igual se puede borrar
-from database_importer import execute_sql_command
-from database_importer import remove_book
-from database_importer import add_book
-from database_importer import get_all_books
-from database_importer import get_reserved_books
-from database_importer import reserve_book
+from database_importer import *
 from cryptography.fernet import Fernet
 from time import sleep
 import os
