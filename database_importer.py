@@ -94,6 +94,7 @@ def add_users(user, password, birthdate, user_id):
 
 def delete_user(user):
     execute_sql_command("DELETE FROM USER WHERE username = ?", (user,))
+    execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE RESERVED = ?", (0,user))
 
 
 def change_username(user, old_username):
