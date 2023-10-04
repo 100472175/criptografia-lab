@@ -65,7 +65,7 @@ def draw_normal():
                     f"it has {book_selection[4]} pages")
                 reserve_book(username, book_selection[0])
                 st.success("Your reservation has been made")
-                sleep(1)
+                sleep(0.5)
                 switch_page("Library")
 
     with col_reservation:

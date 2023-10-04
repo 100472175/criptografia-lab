@@ -6,6 +6,7 @@ import re
 from crypto_settings import CryptoSettings
 from cryptography.exceptions import InvalidKey
 import base64
+from time import sleep
 
 st.set_page_config(
     page_title="Log In",
@@ -74,14 +75,11 @@ with col_1:
                 if exist:
                     if check_id(identifier) and check_password(new_password):
                         cripto = CryptoSettings()
-                        new_password,salt = cripto.encode(new_password)
-                        dot = change_password(user,password,identifier,salt)
+                        new_password, salt = cripto.encode(new_password)
+                        dot = change_password(user, password, identifier, salt)
                         st.success("Password changed successfully")
                 else:
                     st.error("Wrong username or id")
-
-
-
 
 with col_2:
     with st.form("register_form"):
@@ -99,7 +97,5 @@ with col_2:
                 switch_page("Library")
             except sqllite.IntegrityError:
                 st.error("Username already exists, please choose another one")
-
-
-
-
+                sleep(2)
+                switch_page("Log In")

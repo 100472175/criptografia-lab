@@ -103,10 +103,3 @@ def change_username(user, old_username):
 def change_password(user, password, id, salt):
     execute_sql_command("UPDATE USER SET password = ?, salt = ? WHERE username = ? AND id = ?", (password, salt, user, id))
 
-
-"""
-import pick
-options = ["add_books", "add_users"]
-option, index = pick.pick(options, "Title", indicator='=>', default_index=0)
-exec(option + "()")
-"""

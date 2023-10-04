@@ -27,32 +27,34 @@ def logged_in_profile():
     else:
         user = user[0]
         id_valid = False
-        with st.form("update_profile"):
+        with (st.form("update_profile")):
             username_col, password_col, rol_col, identifier_col, birthdate_col = st.columns(5)
             with username_col:
                 new_username = st.text_input("Username", value=user[0], key="username_n", disabled=True)
             with password_col:
-                new_password = st.text_input("Password", value=user[1], key="password", type="password")
-
-                """ No podemos ya que no sabemos la contraseña sin la auntentica contraseña para cambiar xd
+                new_password = st.text_input("Password", value="********", key="password", disabled=True)
+                a = """
+                No podemos ya que no sabemos la contraseña sin la auntentica contraseña para cambiar xd
                 cripto = CryptoSettings()
                 new_password = st.text_input("Password", value=cripto.decode(user[1],user[5]), key="password", type="password")
                 new_password = cripto.encode(new_password)
                 """
             with rol_col:
                 st.text_input("Role", value=user[2], key="role", disabled=True)
+            with identifier_col:
+                new_id = st.text_input("DNI/NIF", value=user[4], key="identifier", disabled=True)
             with birthdate_col:
                 format = '%Y-%m-%d'
                 date = datetime.strptime(user[3], format)
                 new_date = st.date_input("Birthdate", key="birthdate", value=date)
-            with identifier_col:
-                new_id = st.text_input("DNI/NIF", value=user[4], key="identifier")
+            st.markdown("If you want to change your password, you have to do the forgot password method")
+
             if st.form_submit_button("Update profile"):
                 pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
                 id_valid = pattern.match(new_id)
                 if id_valid:
-                    execute_sql_command("UPDATE USER SET  password = ?, birthdate = ?, id = ? WHERE username = ?",
-                                (new_password, new_date, new_id, username))
+                    execute_sql_command("UPDATE USER SET birthdate = ? WHERE username = ?",
+                                (new_date, username))
                     st.success("The details have been changed successfully")
                 else:
                     st.error("The identifier is not valid, please enter a valid one")

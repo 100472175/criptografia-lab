@@ -84,3 +84,6 @@ cur.execute("""
 
 res = cur.execute("SELECT * FROM USER")
 print(res.fetchall())
+add_books()
+res = cur.execute("SELECT * FROM AVAILABLE_BOOKS")
+print(res.fetchall())
