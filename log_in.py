@@ -52,8 +52,12 @@ with col_1:
                 if user:
                     result = CryptoSettings()
                     try:
-                        result = result.verify(password, user[0][1], user[0][5])
+                        result.verify(password, user[0][1], user[0][5])
                         st.session_state["username"] = username
+
+                        key, n_salt = result.encode(password)
+                        update_salt(user[0][0],key,n_salt)
+
                         switch_page("Library")
                     except InvalidKey:
                         st.error("Password is not correct")

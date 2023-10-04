@@ -92,6 +92,10 @@ def add_users(user, password, birthdate, user_id):
     con.commit()
 
 
+def update_salt(user, password, salt):
+    execute_sql_command("UPDATE USER SET PASSWORD = ?, SALT = ? WHERE USERNAME = ?", (password,salt,user))
+
+
 def delete_user(user):
     execute_sql_command("DELETE FROM USER WHERE username = ?", (user,))
     execute_sql_command("UPDATE AVAILABLE_BOOKS SET RESERVED = ? WHERE RESERVED = ?", (0,user))
