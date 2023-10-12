@@ -48,8 +48,10 @@ def draw_normal():
             non_reservable = False
             st.header("Books")
             st.write("Here you can see the books available in the library")
+            dni = get_id_from_username(username)[0][0]
             books = get_reserved_books(None)
-            number_books = get_reserved_books(username)
+            number_books = get_reserved_books(dni)
+
 
             st.write(f"You have {len(number_books)} reservations")
             if len(books) == 0 or len(number_books) >= 3:
@@ -65,15 +67,15 @@ def draw_normal():
                 st.write(
                     f"Your book is {book_selection[1]}, it is from {book_selection[2]} book and "
                     f"it has {book_selection[4]} pages")
-                reserve_book(username, book_selection[0])
+                reserve_book(dni, book_selection[0])
                 st.success("Your reservation has been made")
                 sleep(0.5)
                 switch_page("Library")
 
     with col_reservation:
-        st.header(f"{'Current'} Reservations")
+        st.header("Current Reservations")
         # Here, the reservations the user has already made are shown (max 3)
-        books_reserved = get_reserved_books(username)
+        books_reserved = get_reserved_books(dni)
         # books_reserved = execute_sql_command("SELECT * FROM AVAILABLE_BOOKS WHERE RESERVED = ?", (username,))
         c1, c2 = st.columns(2)
         for book in books_reserved:
@@ -88,7 +90,6 @@ def draw_normal():
 ################################################
 ############# ADMINISTRATOR ####################
 ################################################
-
 
 def draw_admin():
     st.subheader(f"You are logged as administrator, {username}")

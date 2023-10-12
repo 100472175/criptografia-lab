@@ -1,12 +1,14 @@
+import os
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import *
-import sqlite3 as sqllite # No se puede borrar debido al integrity error
+import sqlite3 as sqllite  # No se puede borrar debido al integrity error
 import re
 from crypto_settings import CryptoSettings
 from cryptography.exceptions import InvalidKey
 from time import sleep
 from pages.Profile import password_is_secure
+from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 
 st.set_page_config(
     page_title="Log In",
@@ -14,6 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",  # Can be "auto", "expanded", "collapsed"
     page_icon="📚"
 )
+
 
 def check_id(identifier):
     pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
@@ -31,11 +34,14 @@ f_password = False
 def draw_f_password():
     with st.expander("Forgot password", expanded=f_password):
         with st.form("forgot_password"):
+            reset_psswd = False
             username = st.text_input("Username")
             identifier = st.text_input("DNI/NIF")
             new_password = st.text_input("New Password", type="password")
-
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             if st.form_submit_button("Change password"):
+                reset_psswd = True
+            if reset_psswd:
                 exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username, identifier))
                 if exist:
                     if check_id(identifier) and password_is_secure(new_password):
@@ -43,8 +49,10 @@ def draw_f_password():
                         new_password, salt = cripto.encode(new_password)
                         change_password(user, password, identifier, salt)
                         st.success("Password changed successfully")
+                        sleep(2)
                 else:
                     st.error("Wrong username or id")
+                    reset_psswd = not reset_psswd
 
 
 
@@ -64,9 +72,10 @@ with col_1:
                     try:
                         result.verify(password, user[0][1], user[0][5])
                         st.session_state["username"] = username
+                        st.session_state["dni"] = user[0][4]
 
                         key, n_salt = result.encode(password)
-                        update_salt(user[0][0],key,n_salt)
+                        update_salt(user[0][0], key, n_salt)
 
                         switch_page("Library")
                     except InvalidKey:

@@ -62,9 +62,9 @@ cur.execute("""
      password VARCHAR(100),
      role VARCHAR(10),
      birthdate DATE,
-     id CHAR(9) UNIQUE NOT NULL,
+     id VARCHAR(50) UNIQUE NOT NULL,
      salt varchar(100) NOT NULL,
-     nonce varchar(15),
+     nonce CHAR(12) UNIQUE NOT NULL ,
      PRIMARY KEY (username)
      
      );

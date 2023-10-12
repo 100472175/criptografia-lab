@@ -5,13 +5,6 @@ import re
 from database_importer import execute_sql_command
 
 
-st.set_page_config(
-    page_title="Páginda de administración de bibliotecas Madrid",
-	layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
-	initial_sidebar_state="collapsed",  # Can be "auto", "expanded", "collapsed"
-	page_icon="🧊",  # String, anything supported by st.image, or None.
-)
-
 with st.container():
 	st.title("Encryption and Decryption")
 	st.header("Encrypt and Decrypt your text")

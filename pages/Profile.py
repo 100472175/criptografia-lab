@@ -19,15 +19,7 @@ def password_is_secure(password):
         return True
 
 
-
 def logged_in_profile():
-    st.set_page_config(
-        page_title="Log In",
-        layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
-        initial_sidebar_state="collapsed",  # Can be "auto", "expanded", "collapsed"
-        page_icon="📚"
-    )
-
     st.markdown("<h1 style='text-align: center;'>Profile</h1>", unsafe_allow_html=True)
     st.header("Here you can see your profile and make changes to it")
     st.write(f"You are logged as {username}")
