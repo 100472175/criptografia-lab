@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 from database_importer import *
@@ -8,7 +7,6 @@ from crypto_settings import CryptoSettings
 from cryptography.exceptions import InvalidKey
 from time import sleep
 from pages.Profile import password_is_secure
-from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 
 st.set_page_config(
     page_title="Log In",
@@ -17,9 +15,10 @@ st.set_page_config(
     page_icon="📚"
 )
 
-def check_id(identifier):
+
+def check_id(identifier_):
     pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
-    id_valid = pattern.match(identifier)
+    id_valid = pattern.match(identifier_)
     if not id_valid:
         st.error("The identifier is not valid, please enter a valid one")
         return False
@@ -29,28 +28,25 @@ def check_id(identifier):
 f_password = False
 col_1, col_2 = st.columns(2)
 
-f_password = False
+
 def draw_f_password():
     with st.form("forgot_password"):
-
-        username = st.text_input("Username")
-        identifier = st.text_input("DNI/NIF")
+        username_ = st.text_input("Username")
+        identifier_ = st.text_input("DNI/NIF")
         new_password = st.text_input("New Password", type="password")
         if st.form_submit_button("Change password"):
-            exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username, identifier))
+            exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username_, identifier_))
             if exist:
-                if check_id(identifier) and password_is_secure(new_password):
+                if check_id(identifier_) and password_is_secure(new_password):
                     cripto = CryptoSettings()
                     new_password, salt = cripto.encode(new_password)
-                    change_password(user=username, password=new_password,id= identifier,salt= salt)
+                    change_password(user=username_, password=new_password, id=identifier_, salt=salt)
                     st.success("Password changed successfully")
                     sleep(2)
                     switch_page("Log In")
-
             else:
                 st.error("Wrong username or id")
         sleep(100)
-
 
 
 with col_1:
