@@ -23,6 +23,9 @@ class CryptoSettings:
         kdf = Scrypt(salt=salt, length=self.length, n=self.n, r=self.r, p=self.p)
         return kdf.verify(contrasena.encode(), key)
 
+
+"""SABEMOS QUE ESTO NO SE HACE POR FAVOR PORFAVORSITO, ESTO ESTA HECHO APOSTA PARA EL PROYECTO"""
+
 KEY = base64.b64decode(b'43qDrljAC/3Qn3DfvKyMd0WifJlA5Lsd1E7AgyAUwwo=')
 
 
@@ -32,27 +35,16 @@ def check_ChaCha_id(dni):
     chacha = ChaCha20Poly1305(KEY)
     nonce = os.urandom(12)
     ct = chacha.encrypt(nonce, data, None)
-    print(base64.b64encode(nonce), type(base64.b64encode(nonce)))
-    print("########## DEBUG ##########")
     nonce2 = base64.b64decode(base64.b64encode(nonce))
     chacha2 = ChaCha20Poly1305(KEY)
-    print("Paso por aqui")
     ct2 = chacha.decrypt(nonce, ct, None).decode()
-    print(ct2)
-    print("########## FIN DEBUG ##########")
-    print(base64.b64encode(ct))
     return ct, base64.b64encode(nonce)
 
 def decrypt_id(id):
-    print("Esto es el id: ", id)
     from database_importer import execute_sql_command
     user = execute_sql_command('Select * from USER WHERE id = ?', (id,))
-    print(user)
     nonce = base64.b64decode(user[0][6])
     chacha = ChaCha20Poly1305(KEY)
-    print("Type of nonce:", type(nonce), len(nonce), nonce)
-    print("Type of id:", type(id), len(id), id)
-    print("fffffffffffffffffffffffffffffffffffffffffff")
     ct = chacha.decrypt(nonce, id, None)
     return ct.decode()
 

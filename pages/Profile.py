@@ -20,6 +20,7 @@ def password_is_secure(password):
 
 
 def logged_in_profile():
+
     st.markdown("<h1 style='text-align: center;'>Profile</h1>", unsafe_allow_html=True)
     st.header("Here you can see your profile and make changes to it")
     st.write(f"You are logged as {username}")
@@ -40,7 +41,7 @@ def logged_in_profile():
             with rol_col:
                 st.text_input("Role", value=user[2], key="role", disabled=True)
             with identifier_col:
-                new_id = st.text_input("DNI/NIF", value=user[4], key="identifier", disabled=True)
+                new_id = st.text_input("DNI/NIF", value=decrypt_id(user[4]), key="identifier", disabled=True)
             with birthdate_col:
                 format = '%Y-%m-%d'
                 date = datetime.strptime(user[3], format)

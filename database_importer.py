@@ -24,7 +24,6 @@ def get_all_books():
             books[i][5] = decrypt_id(books[i][5])
         else:
             books[i][5] = "Libre"
-    print(books)
     return books
 
 

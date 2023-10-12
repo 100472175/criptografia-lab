@@ -17,7 +17,6 @@ st.set_page_config(
     page_icon="📚"
 )
 
-
 def check_id(identifier):
     pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
     id_valid = pattern.match(identifier)
@@ -32,27 +31,25 @@ col_1, col_2 = st.columns(2)
 
 f_password = False
 def draw_f_password():
-    with st.expander("Forgot password", expanded=f_password):
-        with st.form("forgot_password"):
-            reset_psswd = False
-            username = st.text_input("Username")
-            identifier = st.text_input("DNI/NIF")
-            new_password = st.text_input("New Password", type="password")
-            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-            if st.form_submit_button("Change password"):
-                reset_psswd = True
-            if reset_psswd:
-                exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username, identifier))
-                if exist:
-                    if check_id(identifier) and password_is_secure(new_password):
-                        cripto = CryptoSettings()
-                        new_password, salt = cripto.encode(new_password)
-                        change_password(user, password, identifier, salt)
-                        st.success("Password changed successfully")
-                        sleep(2)
-                else:
-                    st.error("Wrong username or id")
-                    reset_psswd = not reset_psswd
+    with st.form("forgot_password"):
+
+        username = st.text_input("Username")
+        identifier = st.text_input("DNI/NIF")
+        new_password = st.text_input("New Password", type="password")
+        if st.form_submit_button("Change password"):
+            exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username, identifier))
+            if exist:
+                if check_id(identifier) and password_is_secure(new_password):
+                    cripto = CryptoSettings()
+                    new_password, salt = cripto.encode(new_password)
+                    change_password(user=username, password=new_password,id= identifier,salt= salt)
+                    st.success("Password changed successfully")
+                    sleep(2)
+                    switch_page("Log In")
+
+            else:
+                st.error("Wrong username or id")
+        sleep(100)
 
 
 
