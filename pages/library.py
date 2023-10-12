@@ -39,11 +39,13 @@ def draw_normal():
         )
         if clicked > -1:
             switch_page("Profile")
+        st.write(f"You are logged as {username}")
 
     st.subheader("Welcome to the library, here you can see the books available and make reservations on them")
     col_books, col_reservation = st.columns(2)
     with col_books:
         with st.form("Book_reservation"):
+            non_reservable = False
             st.header("Books")
             st.write("Here you can see the books available in the library")
             books = get_reserved_books(None)

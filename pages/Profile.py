@@ -1,11 +1,23 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
-from database_importer import delete_user
-from database_importer import execute_sql_command
+from database_importer import *
 from datetime import datetime
 from crypto_settings import CryptoSettings
 import re
 from time import sleep
+
+def password_is_secure(password):
+    if len(password) < 10:
+        st.error("Password is does not have the minimum length")
+        return False
+
+    spacial_character = ['$', '#', '@', '!', '*']
+    if not any(char in spacial_character for char in password):
+        st.error("Password does not contain a spacial character: " + str(spacial_character))
+        return False
+    else:
+        return True
+
 
 
 def logged_in_profile():
@@ -32,13 +44,7 @@ def logged_in_profile():
             with username_col:
                 new_username = st.text_input("Username", value=user[0], key="username_n", disabled=True)
             with password_col:
-                new_password = st.text_input("Password", value="********", key="password", disabled=True)
-                a = """
-                No podemos ya que no sabemos la contraseña sin la auntentica contraseña para cambiar xd
-                cripto = CryptoSettings()
-                new_password = st.text_input("Password", value=cripto.decode(user[1],user[5]), key="password", type="password")
-                new_password = cripto.encode(new_password)
-                """
+                new_password = st.text_input("Password",value="*********",key="password_n")
             with rol_col:
                 st.text_input("Role", value=user[2], key="role", disabled=True)
             with identifier_col:
@@ -50,16 +56,15 @@ def logged_in_profile():
             st.markdown("If you want to change your password, you have to do the forgot password method")
 
             if st.form_submit_button("Update profile"):
-                pattern = re.compile("^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$")
-                id_valid = pattern.match(new_id)
-                if id_valid:
+                if password_is_secure(new_password):
+                    cripto = CryptoSettings()
+                    new_password, salt = cripto.encode(new_password)
+                    change_password(user[0], new_password, user[4], salt)
+
+                if date != user[3]:
                     execute_sql_command("UPDATE USER SET birthdate = ? WHERE username = ?",
                                 (new_date, username))
                     st.success("The details have been changed successfully")
-                else:
-                    st.error("The identifier is not valid, please enter a valid one")
-
-            # Llamar a la funcion de cambio de cada una individualmente, o multiples en un mismo comando
 
 
         if st.button("Log out",type= "secondary"):

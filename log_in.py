@@ -5,8 +5,8 @@ import sqlite3 as sqllite # No se puede borrar debido al integrity error
 import re
 from crypto_settings import CryptoSettings
 from cryptography.exceptions import InvalidKey
-import base64
 from time import sleep
+from pages.Profile import password_is_secure
 
 st.set_page_config(
     page_title="Log In",
@@ -23,21 +23,31 @@ def check_id(identifier):
         return False
     return True
 
-def check_password(password):
-    if len(password) < 10:
-        st.error("Password is does not have the minimum length")
-        return False
-
-    spacial_character = ['$', '#', '@', '!', '*']
-    if not any(char in spacial_character for char in password):
-        st.error("Password does not contain a spacial character: " + str(spacial_character))
-        return False
-    else:
-        return True
-
 
 f_password = False
 col_1, col_2 = st.columns(2)
+
+f_password = False
+def draw_f_password():
+    with st.expander("Forgot password", expanded=f_password):
+        with st.form("forgot_password"):
+            username = st.text_input("Username")
+            identifier = st.text_input("DNI/NIF")
+            new_password = st.text_input("New Password", type="password")
+
+            if st.form_submit_button("Change password"):
+                exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username, identifier))
+                if exist:
+                    if check_id(identifier) and password_is_secure(new_password):
+                        cripto = CryptoSettings()
+                        new_password, salt = cripto.encode(new_password)
+                        change_password(user, password, identifier, salt)
+                        st.success("Password changed successfully")
+                else:
+                    st.error("Wrong username or id")
+
+
+
 with col_1:
     with st.form("log_in_form"):
         st.markdown("<h1 style='text-align: center;'>Log In</h1>", unsafe_allow_html=True)
@@ -68,22 +78,8 @@ with col_1:
             if st.form_submit_button("Forgot the password"):
                 f_password = True
 
-    with st.expander("Forgot password", expanded=f_password):
-        with st.form("forgot_password"):
-            username = st.text_input("Username")
-            identifier = st.text_input("DNI/NIF")
-            new_password = st.text_input("New Password", type="password")
-
-            if st.form_submit_button("Change password"):
-                exist = execute_sql_command("SELECT * FROM USER WHERE username = ? and id= ?", (username,identifier))
-                if exist:
-                    if check_id(identifier) and check_password(new_password):
-                        cripto = CryptoSettings()
-                        new_password, salt = cripto.encode(new_password)
-                        dot = change_password(user, password, identifier, salt)
-                        st.success("Password changed successfully")
-                else:
-                    st.error("Wrong username or id")
+    if f_password:
+        draw_f_password()
 
 with col_2:
     with st.form("register_form"):

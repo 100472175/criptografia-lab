@@ -64,6 +64,7 @@ cur.execute("""
      birthdate DATE,
      id CHAR(9) UNIQUE NOT NULL,
      salt varchar(100) NOT NULL,
+     nonce varchar(15),
      PRIMARY KEY (username)
      
      );
